@@ -6,6 +6,32 @@ from config.config import Configuration as config
 from calibration.transform_camera_view import TransformCameraView
 from calibration.scale_factor_estimation import ScaleFactorEstimator
 
+def gstreamer_pipeline(
+    capture_width=3280,
+    capture_height=2464,
+    display_width=820,
+    display_height=616,
+    framerate=21,
+    flip_method=0,
+):
+    return (
+        "nvarguscamerasrc ! "
+        "video/x-raw(memory:NVMM), "
+        "width=(int)%d, height=(int)%d, "
+        "format=(string)NV12, framerate=(fraction)%d/1 ! "
+        "nvvidconv flip-method=%d ! "
+        "video/x-raw, width=(int)%d, height=(int)%d, format=(string)BGRx ! "
+        "videoconvert ! "
+        "video/x-raw, format=(string)BGR ! appsink"
+        % (
+            capture_width,
+            capture_height,
+            framerate,
+            flip_method,
+            display_width,
+            display_height,
+        )
+    )
 
 def transform_camera_view(image, no_points):
     transformer = TransformCameraView(image)
@@ -46,16 +72,23 @@ if __name__ == "__main__":
     num_points = args["num_points"]
     num_iterations = args["num_iterations"]
     # Read video and get the first frame
-    video = cv2.VideoCapture(video_path)
+    video = cv2.VideoCapture(gstreamer_pipeline(), cv2.CAP_GSTREAMER)
     if video.isOpened():
-        ret, frame = video.read()
-        if not ret:
-            print(f"Error reading the video file. Existing")
-            sys.exit(1)
+         ret, frame = video.read()
+         if not ret:
+             print(f"Error reading the video file. Existing")
+             sys.exit(1)
     else:
-        print(f"Invalid video path. Existing")
-        sys.exit(1)
+         print(f"Invalid video path. Existing")
+         sys.exit(1)
     video.release()
+    #img = cv2.imread(video_path)
+    #scale_percent = 20 # percent of original size
+    #width = int(img.shape[1] * scale_percent / 100)
+    #height = int(img.shape[0] * scale_percent / 100)
+    #dim = (width, height)
+    # resize image
+    #frame = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
     # Estimate the camera view to bird eye view transformation and scale factor
     cal_obj = transform_camera_view(frame, num_points)
     scale_factor = calculate_scale_factor(frame, cal_obj.transformation_matrix, 2, num_iterations)
