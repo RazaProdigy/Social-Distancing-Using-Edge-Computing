@@ -1,5 +1,5 @@
 # Social Distancing
-This repository implements the social distance violation detection to reduce the spread of COVID-19 and other diseases by ensuring social distancing in public places including shopping malls, hospitals and restaurants.
+This repository implements the social distance violation detection to reduce the spread of COVID-19 and other diseases by ensuring social distancing in public places including shopping malls, hospitals and restaurants. (The callibration files were taken from the following repository: https://github.com/mmaaz60/social_distancing)
 
 # Demo
 A demo video can be found at https://youtu.be/gXX8fuQbUFI. 
@@ -166,5 +166,4 @@ In order to add a new person detector, you need to do the following,
 - [x] Add demo video link and other required resources to reproduce the demo results.
 - [x] Add instructions to add custom person detector into the project
 
-# Collaboration
-The pull requests are welcome. If you have any questions, please email me at **mmaaz60@gmail.com**.
+
